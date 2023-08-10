@@ -1,10 +1,10 @@
 #include "DIC_OPTIONS.h"
 
 CBOP
-C !ROUTINE: DIC_BIOTIC_INIT
+C !ROUTINE: DIC_ABIOTIC_INIT
 
 C !INTERFACE: ==========================================================
-      SUBROUTINE DIC_BIOTIC_INIT( myThid )
+      SUBROUTINE DIC_ABIOTIC_INIT( myThid )
 
 C !DESCRIPTION:
 C  DIC diagnostic initialization
@@ -21,7 +21,6 @@ C  myThid               :: thread number
       INTEGER myThid
 CEOP
 
-#ifdef DIC_BIOTIC
 #ifdef ALLOW_TIMEAVE
 
 C !LOCAL VARIABLES: ====================================================
@@ -31,19 +30,16 @@ c     CHARACTER*(MAX_LEN_MBUF) suff
 C set arrays to zero if first timestep
         DO bj = myByLo(myThid), myByHi(myThid)
          DO bi = myBxLo(myThid), myBxHi(myThid)
-          CALL TIMEAVE_RESET(BIOave,   Nr,  bi, bj, myThid)
-          CALL TIMEAVE_RESET(CARave,   Nr,  bi, bj, myThid)
-          CALL TIMEAVE_RESET(OmegaCave,   Nr,  bi, bj, myThid)
-          CALL TIMEAVE_RESET(pfluxave,   Nr,  bi, bj, myThid)
-          CALL TIMEAVE_RESET(epfluxave,   Nr,  bi, bj, myThid)
-          CALL TIMEAVE_RESET(cfluxave,   Nr,  bi, bj, myThid)
+          CALL TIMEAVE_RESET(SURave,   1,  bi, bj, myThid)
+          CALL TIMEAVE_RESET(SUROave,   1,  bi, bj, myThid)
+          CALL TIMEAVE_RESET(pCO2ave,   1,  bi, bj, myThid)
+          CALL TIMEAVE_RESET(pHave,   1,  bi, bj, myThid)
+          CALL TIMEAVE_RESET(fluxCO2ave,   1,  bi, bj, myThid)
 c         print*,'QQ start timeave'
-          DIC_BioTimeAve(bi,bj) = 0. _d 0
+          DIC_AbioTimeAve(bi,bj) = 0. _d 0
          ENDDO
         ENDDO
-
 #endif /* ALLOW_TIMEAVE */
-#endif /* DIC_BIOTIC   */
 
       RETURN
       END

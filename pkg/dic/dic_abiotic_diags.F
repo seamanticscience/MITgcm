@@ -1,10 +1,10 @@
 #include "DIC_OPTIONS.h"
 
 CStartOfInterface
-      SUBROUTINE DIC_BIOTIC_DIAGS( myTime, myIter, myThid )
+      SUBROUTINE DIC_ABIOTIC_DIAGS( myTime, myIter, myThid )
 C     *==========================================================*
-C     | SUBROUTINE DIC_BIOTIC_DIAGS
-C     | o Do DIC diagnostic output
+C     | SUBROUTINE DIC_ABIOTIC_DIAGS
+C     | o Do DIC abiotic diagnostic output
 C     *==========================================================*
 C     *==========================================================*
       IMPLICIT NONE
@@ -26,9 +26,7 @@ C     myThid -  Number of this instance of INI_FORCING
       INTEGER myThid
 CEndOfInterface
 
-#ifdef DIC_BIOTIC
 #ifdef ALLOW_TIMEAVE
-
 C     == Local variables ==
       LOGICAL  DIFFERENT_MULTIPLE
       EXTERNAL DIFFERENT_MULTIPLE
@@ -44,17 +42,15 @@ C     Dump files and restart average computation if needed
 C      Normalize by integrated time
        DO bj = myByLo(myThid), myByHi(myThid)
         DO bi = myBxLo(myThid), myBxHi(myThid)
-         CALL TIMEAVE_NORMALIZE(BIOave, DIC_BioTimeAve, Nr ,
+         CALL TIMEAVE_NORMALIZE(SURave,DIC_AbioTimeAve, 1 ,
      &                 bi,bj,myThid)
-         CALL TIMEAVE_NORMALIZE(CARave, DIC_BioTimeAve, Nr ,
+         CALL TIMEAVE_NORMALIZE(SUROave,DIC_AbioTimeAve, 1 ,
      &                 bi,bj,myThid)
-         CALL TIMEAVE_NORMALIZE(OmegaCave, DIC_BioTimeAve, Nr ,
+         CALL TIMEAVE_NORMALIZE(pCO2ave,DIC_AbioTimeAve, 1 ,
      &                 bi,bj,myThid)
-         CALL TIMEAVE_NORMALIZE(pfluxave,DIC_BioTimeAve, Nr ,
+         CALL TIMEAVE_NORMALIZE(pHave,DIC_AbioTimeAve, 1 ,
      &                 bi,bj,myThid)
-         CALL TIMEAVE_NORMALIZE(epfluxave,DIC_BioTimeAve, Nr ,
-     &                 bi,bj,myThid)
-         CALL TIMEAVE_NORMALIZE(cfluxave,DIC_BioTimeAve, Nr ,
+         CALL TIMEAVE_NORMALIZE(fluxCO2ave,DIC_AbioTimeAve, 1 ,
      &                 bi,bj,myThid)
         ENDDO
        ENDDO
@@ -65,17 +61,15 @@ C      Normalize by integrated time
          ELSE
            CALL RW_GET_SUFFIX( suff, myTime, myIter, myThid )
          ENDIF
-         CALL WRITE_FLD_XYZ_RL('DIC_Biotave.',suff,BIOave,
+         CALL WRITE_FLD_XY_RL('DIC_Surtave.',suff,SURave,
      &        myIter,myThid)
-         CALL WRITE_FLD_XYZ_RL('DIC_Cartave.',suff,CARave,
+         CALL WRITE_FLD_XY_RL('DIC_SurOtave.',suff,SUROave,
      &        myIter,myThid)
-         CALL WRITE_FLD_XYZ_RL('DIC_OmegaCtave.',suff,OmegaCave,
+         CALL WRITE_FLD_XY_RL('DIC_pHtave.',suff,pHave,
      &        myIter,myThid)
-         CALL WRITE_FLD_XYZ_RL('DIC_pfluxtave.',suff,pfluxave,
+         CALL WRITE_FLD_XY_RL('DIC_pCO2tave.',suff,pCO2ave,
      &        myIter,myThid)
-         CALL WRITE_FLD_XYZ_RL('DIC_epfluxtave.',suff,epfluxave,
-     &        myIter,myThid)
-         CALL WRITE_FLD_XYZ_RL('DIC_cfluxtave.',suff,cfluxave,
+         CALL WRITE_FLD_XY_RL('DIC_fluxCO2ave.',suff,fluxCO2ave,
      &        myIter,myThid)
        ENDIF
 
@@ -91,35 +85,31 @@ C      Normalize by integrated time
          CALL MNC_CW_SET_UDIM('dic_tave', 0, myThid)
          CALL MNC_CW_I_W_S('I','dic_tave',0,0,'iter',myIter,myThid)
          CALL MNC_CW_RL_W(
-     &        pf,'dic_tave',0,0,'dic_BIO_ave',BIOave,myThid)
+     &        pf,'dic_tave',0,0,'dic_SUR_ave',SURave,myThid)
          CALL MNC_CW_RL_W(
-     &        pf,'dic_tave',0,0,'dic_CAR_ave',CARave,myThid)
+     &        pf,'dic_tave',0,0,'dic_SURO_ave',SUROave,myThid)
          CALL MNC_CW_RL_W(
-     &        pf,'dic_tave',0,0,'dic_OmegaC_ave',OmegaCave,myThid)
+     &        pf,'dic_tave',0,0,'dic_pH_ave',pHave,myThid)
          CALL MNC_CW_RL_W(
-     &        pf,'dic_tave',0,0,'dic_pflux_ave',pfluxave,myThid)
+     &        pf,'dic_tave',0,0,'dic_pCO2_ave',pCO2ave,myThid)
          CALL MNC_CW_RL_W(
-     &        pf,'dic_tave',0,0,'dic_epflux_ave',epfluxave,myThid)
-         CALL MNC_CW_RL_W(
-     &        pf,'dic_tave',0,0,'dic_cflux_ave',cfluxave,myThid)
+     &        pf,'dic_tave',0,0,'dic_fluxCO2_ave',fluxCO2ave,myThid)
        ENDIF
 #endif
 
 C      Reset averages to zero
        DO bj = myByLo(myThid), myByHi(myThid)
         DO bi = myBxLo(myThid), myBxHi(myThid)
-         CALL TIMEAVE_RESET(BIOave,Nr,bi,bj,myThid)
-         CALL TIMEAVE_RESET(CARave,Nr,bi,bj,myThid)
-         CALL TIMEAVE_RESET(OmegaCave,Nr,bi,bj,myThid)
-         CALL TIMEAVE_RESET(pfluxave,Nr,bi,bj,myThid)
-         CALL TIMEAVE_RESET(epfluxave,Nr,bi,bj,myThid)
-         CALL TIMEAVE_RESET(cfluxave,Nr,bi,bj,myThid)
-         DIC_BioTimeAve(bi,bj) = 0. _d 0
+         CALL TIMEAVE_RESET(SURave,1,bi,bj,myThid)
+         CALL TIMEAVE_RESET(SUROave,1,bi,bj,myThid)
+         CALL TIMEAVE_RESET(pCO2ave,1,bi,bj,myThid)
+         CALL TIMEAVE_RESET(pHave,1,bi,bj,myThid)
+         CALL TIMEAVE_RESET(fluxCO2ave,1,bi,bj,myThid)
+         DIC_AbioTimeAve(bi,bj) = 0. _d 0
         ENDDO
        ENDDO
 
       ENDIF
 #endif /* ALLOW_TIMEAVE */
-#endif /* DIC_BIOTIC   */
       RETURN
       END

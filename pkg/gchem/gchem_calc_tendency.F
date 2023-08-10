@@ -99,6 +99,9 @@ C chemical forcing      |
 C------------------------
 #ifdef ALLOW_SPOIL
         IF ( useSPOIL ) THEN
+#ifdef ALLOW_DEBUG
+          IF (debugMode) CALL DEBUG_CALL('SPOIL_CALC_TENDENCY',myThid)
+#endif
           CALL SPOIL_CALC_TENDENCY( bi, bj,
      I                              myTime, myIter, myThid )
         ENDIF
@@ -108,6 +111,9 @@ C------------------------
         IF ( useCFC ) THEN
          iTr = CFC_pTr_i1
          jTr = iTr - gchem_sepFTr_num
+#ifdef ALLOW_DEBUG
+         IF (debugMode) CALL DEBUG_CALL('CFC11_FORCING',myThid)
+#endif
          CALL CFC11_FORCING(
      I                       pTracer     (1-OLx,1-OLy,1,bi,bj,iTr),
      U                       gchemTendency(1-OLx,1-OLy,1,bi,bj,jTr),
@@ -115,6 +121,9 @@ C------------------------
      I                       myTime, myIter, myThid )
          iTr = CFC_pTr_i1 + 1
          jTr = iTr - gchem_sepFTr_num
+#ifdef ALLOW_DEBUG
+         IF (debugMode) CALL DEBUG_CALL('CFC12_FORCING',myThid)
+#endif
          CALL CFC12_FORCING(
      I                       pTracer     (1-OLx,1-OLy,1,bi,bj,iTr),
      U                       gchemTendency(1-OLx,1-OLy,1,bi,bj,jTr),

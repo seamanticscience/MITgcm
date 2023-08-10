@@ -146,31 +146,46 @@ ccccccccccccccccccccccccccc DIC cccccccccccccccccccccccccccccccc
         IF ( useDIC ) THEN
 # endif /* ALLOW_AUTODIFF */
 #ifdef ALLOW_DEBUG
+         IF (debugMode) CALL DEBUG_CALL('DIC_ABIOTIC_FORCING',myThid)
+#endif
+C DIC ABIOTIC FORCING precalculates air-sea fluxes of CO2, ALK, and O2
+C Phosphate is required for pH/pCO2 calculations (carbon_chem)
+         CALL DIC_ABIOTIC_FORCING(
+     &                      pTracer      (1-OLx,1-OLy,1,bi,bj,iDIC),
+     &                      pTracer      (1-OLx,1-OLy,1,bi,bj,iALK),
+     &                      pTracer      (1-OLx,1-OLy,1,bi,bj,iPO4),
+#ifdef ALLOW_O2
+     &                      pTracer      (1-OLx,1-OLy,1,bi,bj,iO2),
+#endif
+     &                      bi, bj, iMin, iMax, jMin, jMax,
+     &                      myIter, myTime, myThid )
+#ifdef DIC_BIOTIC
+#ifdef ALLOW_DEBUG
           IF (debugMode) CALL DEBUG_CALL('DIC_BIOTIC_FORCING',myThid)
 #endif
 #ifdef ALLOW_FE
-          CALL DIC_BIOTIC_FORCING( pTracer(1-OLx,1-OLy,1,bi,bj,1),
-     &                          pTracer(1-OLx,1-OLy,1,bi,bj,2),
-     &                          pTracer(1-OLx,1-OLy,1,bi,bj,3),
-     &                          pTracer(1-OLx,1-OLy,1,bi,bj,4),
-     &                          pTracer(1-OLx,1-OLy,1,bi,bj,5),
-     &                          pTracer(1-OLx,1-OLy,1,bi,bj,6),
+          CALL DIC_BIOTIC_FORCING( pTracer(1-OLx,1-OLy,1,bi,bj,iDIC),
+     &                          pTracer(1-OLx,1-OLy,1,bi,bj,iALK),
+     &                          pTracer(1-OLx,1-OLy,1,bi,bj,iPO4),
+     &                          pTracer(1-OLx,1-OLy,1,bi,bj,iDOP),
+     &                          pTracer(1-OLx,1-OLy,1,bi,bj,iO2),
+     &                          pTracer(1-OLx,1-OLy,1,bi,bj,iFE),
      &                          bi, bj, iMin, iMax, jMin, jMax,
      &                          myIter, myTime, myThid )
 #else
 #ifdef ALLOW_O2
-          CALL DIC_BIOTIC_FORCING( pTracer(1-OLx,1-OLy,1,bi,bj,1),
-     &                          pTracer(1-OLx,1-OLy,1,bi,bj,2),
-     &                          pTracer(1-OLx,1-OLy,1,bi,bj,3),
-     &                          pTracer(1-OLx,1-OLy,1,bi,bj,4),
-     &                          pTracer(1-OLx,1-OLy,1,bi,bj,5),
+          CALL DIC_BIOTIC_FORCING( pTracer(1-OLx,1-OLy,1,bi,bj,iDIC),
+     &                          pTracer(1-OLx,1-OLy,1,bi,bj,iALK),
+     &                          pTracer(1-OLx,1-OLy,1,bi,bj,iPO4),
+     &                          pTracer(1-OLx,1-OLy,1,bi,bj,iDOP),
+     &                          pTracer(1-OLx,1-OLy,1,bi,bj,iO2),
      &                          bi, bj, iMin, iMax, jMin, jMax,
      &                          myIter, myTime, myThid )
 #else
-          CALL DIC_BIOTIC_FORCING( pTracer(1-OLx,1-OLy,1,bi,bj,1),
-     &                          pTracer(1-OLx,1-OLy,1,bi,bj,2),
-     &                          pTracer(1-OLx,1-OLy,1,bi,bj,3),
-     &                          pTracer(1-OLx,1-OLy,1,bi,bj,4),
+          CALL DIC_BIOTIC_FORCING( pTracer(1-OLx,1-OLy,1,bi,bj,iDIC),
+     &                          pTracer(1-OLx,1-OLy,1,bi,bj,iALK),
+     &                          pTracer(1-OLx,1-OLy,1,bi,bj,iPO4),
+     &                          pTracer(1-OLx,1-OLy,1,bi,bj,iDOP),
      &                          bi, bj, iMin, iMax, jMin, jMax,
      &                          myIter, myTime, myThid )
 #endif
@@ -178,6 +193,7 @@ ccccccccccccccccccccccccccc DIC cccccccccccccccccccccccccccccccc
 # ifndef ALLOW_AUTODIFF
         ENDIF
 # endif /* ALLOW_AUTODIFF */
+#endif /* DIC_BIOTIC */
 #endif /* ALLOW_DIC */
 cccccccccccccccccccccccccc END DIC cccccccccccccccccccccccccccccccccc
 

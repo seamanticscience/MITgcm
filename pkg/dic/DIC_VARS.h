@@ -33,6 +33,29 @@ C                       for air-sea CO2 and O2 flux calculations.
       _RL  FIce(1-OLx:sNx+OLx,1-OLy:sNy+OLy,nSx,nSy)
       _RL  Silica(1-OLx:sNx+OLx,1-OLy:sNy+OLy,nSx,nSy)
       _RL  Kwexch_Pre(1-OLx:sNx+OLx,1-OLy:sNy+OLy,nSx,nSy)
+      _RL  (1-OLx:sNx+OLx,1-OLy:sNy+OLy,nSx,nSy)
+      _RL SUROave   (1-OLx:sNx+OLx,1-OLy:sNy+OLy,nSx,nSy)
+      _RL pCO2ave   (1-OLx:sNx+OLx,1-OLy:sNy+OLy,nSx,nSy)
+
+C For averages of the output using TIMEAVE
+C  SURave     :: tendency of DIC due to air-sea exchange
+C                 and virtual flux [mol C/m3/s]
+C  SUROave    :: tendency of O2 due to air-sea exchange [mol O2/m3/s]
+C  pCO2ave    :: surface ocean pCO2 [uatm]
+C  pHave      :: surface ocean pH
+C  fluxCO2ave :: Air-sea flux of CO2 [mol C/m2/s]
+C  DIC_AbioTimeAve  :: period over which DIC averages are calculated [s]
+
+      COMMON /ABIOTIC_TAVE/
+     &     SURave, SUROave, pCO2ave, pHave,
+     &     fluxCO2ave, DIC_timeAve
+
+      _RL SURave    (1-OLx:sNx+OLx,1-OLy:sNy+OLy,nSx,nSy)
+      _RL SUROave   (1-OLx:sNx+OLx,1-OLy:sNy+OLy,nSx,nSy)
+      _RL pCO2ave   (1-OLx:sNx+OLx,1-OLy:sNy+OLy,nSx,nSy)
+      _RL pHave     (1-OLx:sNx+OLx,1-OLy:sNy+OLy,nSx,nSy)
+      _RL fluxCO2ave(1-OLx:sNx+OLx,1-OLy:sNy+OLy,nSx,nSy)
+      _RL DIC_AbioTimeAve(nSx,nSy)
 
 C Store dissociation and carbon chemistry coefficients for
 C    pCO2 solvers (see carbon_chem.F).
@@ -154,9 +177,9 @@ C     =3 :: use FAST solver routine.
 
 C Store dissociation coefficients for O2 solubility
        COMMON /OXYGEN_CHEM/
-     &              oA0,oA1,oA2,oA3,oA4,oA5,
-     &              oB0,oB1,oB2,oB3,
-     &              oC0
+     &    oA0,oA1,oA2,oA3,oA4,oA5,
+     &    oB0,oB1,oB2,oB3,
+     &    oC0
       _RL oA0,oA1,oA2,oA3,oA4,oA5
       _RL oB0,oB1,oB2,oB3
       _RL oC0
@@ -242,35 +265,24 @@ C For averages of the output using TIMEAVE
 C  BIOave     :: biological productivity [mol P/m3/s]
 C  CARave     :: carbonate changes due to biological productivity
 C                 and remineralization [mol C/m3/s]
-C  SURave     :: tendency of DIC due to air-sea exchange
-C                 and virtual flux [mol C/m3/s]
-C  SUROave    :: tendency of O2 due to air-sea exchange [mol O2/m3/s]
-C  pCO2ave    :: surface ocean pCO2 [uatm]
-C  pHave      :: surface ocean pH
-C  fluxCO2ave :: Air-sea flux of CO2 [mol C/m2/s]
 C  omegaCave  :: Local saturation state with respect to calcite
 C  pfluxave   :: changes to PO4 due to flux and remineralization [mol P/m3/s]
 C  epfluxave  :: export flux of PO4 through each layer [mol P/m2/s]
 C  cfluxave   :: carbonate changes due to flux and remineralization [mol C/m3/s]
-C  DIC_timeAve  :: period over which DIC averages are calculated [s]
+C  DIC_BioTimeAve  :: period over which DIC averages are calculated [s]
 
       COMMON /BIOTIC_TAVE/
-     &     BIOave, CARave, SURave, SUROave, pCO2ave, pHave,
-     &     fluxCO2ave, omegaCave, pfluxave, epfluxave, cfluxave,
-     &     DIC_timeAve
+     &     BIOave, CARave, 
+     &     omegaCave, pfluxave, epfluxave, cfluxave,
+     &     DIC_BioTimeAve
 
       _RL BIOave    (1-OLx:sNx+OLx,1-OLy:sNy+OLy,Nr,nSx,nSy)
       _RL CARave    (1-OLx:sNx+OLx,1-OLy:sNy+OLy,Nr,nSx,nSy)
-      _RL SURave    (1-OLx:sNx+OLx,1-OLy:sNy+OLy,nSx,nSy)
-      _RL SUROave   (1-OLx:sNx+OLx,1-OLy:sNy+OLy,nSx,nSy)
-      _RL pCO2ave   (1-OLx:sNx+OLx,1-OLy:sNy+OLy,nSx,nSy)
-      _RL pHave     (1-OLx:sNx+OLx,1-OLy:sNy+OLy,nSx,nSy)
-      _RL fluxCO2ave(1-OLx:sNx+OLx,1-OLy:sNy+OLy,nSx,nSy)
       _RL OmegaCave (1-OLx:sNx+OLx,1-OLy:sNy+OLy,Nr,nSx,nSy)
       _RL pfluxave  (1-OLx:sNx+OLx,1-OLy:sNy+OLy,Nr,nSx,nSy)
       _RL epfluxave (1-OLx:sNx+OLx,1-OLy:sNy+OLy,Nr,nSx,nSy)
       _RL cfluxave  (1-OLx:sNx+OLx,1-OLy:sNy+OLy,Nr,nSx,nSy)
-      _RL DIC_timeAve(nSx,nSy)
+      _RL DIC_BioTimeAve(nSx,nSy)
 
 C Values for biotic biogeochemistry
 C     (many set in data.dic, defaults to values in dic_readparms.F)
